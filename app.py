@@ -8,8 +8,7 @@ SMS=db['SMS']
 @app.route('/filter', methods=['POST'])
 def filter():
     SMSs=list(SMS.find({'status': 0}))
-    selectedSMS=[]
-    unselectedSMS=[]
+    SMSList=[]
     data=request.get_json()
     tasks=data.get('tasks',[])
     keywords=data.get('keywords',[])
@@ -30,38 +29,45 @@ def filter():
         if any('\u4e00' <= char <= '\u9fff' for char in S['smsBody']):
            chinese_words = list(jieba.lcut(S['smsBody']))
            if have_common_item(chinese_words,tasks)['status'] & common(chinese_words,keywords):
-               selected_data={
+               smsData={
                    "_id": S["_id"],
                     "phoneNo": S["phoneNo"],
                     "smsBody": S['smsBody'],
-                    "email": have_common_item(chinese_words,tasks)['email']
+                    "email": have_common_item(chinese_words,tasks)['email'],
+                    "selected": True
                }
-               selectedSMS.append(selected_data)
+               SMSList.append(smsData)
            else:
-               unselected_data={
+               smsData={
                    "_id": S["_id"],
                     "phoneNo": S["phoneNo"],
                     "smsBody": S['smsBody'],
+                    "email": None,
+                    "selected": False
+                    
                }
-               unselectedSMS.append(unselected_data)
+               SMSList.append(smsData)
         else:
            english_words = S['smsBody'].split()
            if have_common_item(english_words,tasks)['status'] & common(english_words,keywords):
-               selected_data={
+               smsData={
                    "_id": S["_id"],
                     "phoneNo": S["phoneNo"],
                     "smsBody": S['smsBody'],
-                    "email": have_common_item(english_words,tasks)['email']
+                    "email": have_common_item(english_words,tasks)['email'],
+                    "selected": True
                }
-               selectedSMS.append(selected_data)
+               SMSList.append(smsData)
            else:
-               unselected_data={
+               smsData={
                    "_id": S["_id"],
                     "phoneNo": S["phoneNo"],
                     "smsBody": S['smsBody'],
+                    "email": None,
+                    "selected": False
                }
-               unselectedSMS.append(unselected_data)
-    return jsonify({"selectedSMS":selectedSMS,"unselectedSMS":unselectedSMS})
+               SMSList.append(smsData)
+    return jsonify({"SMS":SMSList})
 # 在手機處於運行狀態時收到了一條SMS，插入MongoDB以及做篩選
 @app.route('/filter/one/sms', methods=['POST'])
 def filterOne():
@@ -100,6 +106,7 @@ def filterOne():
                    "_id": inserted_id,
                     "phoneNo": sms["phoneNo"],
                     "smsBody": sms['smsBody'],
+                    "email": None,
                     "selected": False
                }
         else:
@@ -117,6 +124,7 @@ def filterOne():
                     "_id": inserted_id,
                     "phoneNo": sms["phoneNo"],
                     "smsBody": sms['smsBody'],
+                    "email": None,
                     "selected": False
                 }
         return jsonify({"message": sms_object})
