@@ -67,7 +67,7 @@ def filter():
                     "selected": False
                }
                SMSList.append(smsData)
-    return jsonify({"SMS":SMSList})
+    return jsonify({SMSList})
 # 在手機處於運行狀態時收到了一條SMS，插入MongoDB以及做篩選
 @app.route('/filter/one/sms', methods=['POST'])
 def filterOne():
