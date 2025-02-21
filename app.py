@@ -109,7 +109,7 @@ def filterOne():
                     "_id": inserted_id,
                     "phoneNo": sms["phoneNo"],
                     "smsBody": sms['smsBody'],
-                    "email": have_common_item(chinese_words,tasks)['email'],
+                    "email": have_common_item(english_words,tasks)['email'],
                     "selected": True
                 }
             else:
