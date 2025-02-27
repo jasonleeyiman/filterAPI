@@ -30,7 +30,8 @@ def filter():
            chinese_words = list(jieba.lcut(S['smsBody']))
            if have_common_item(chinese_words,tasks)['status'] & common(chinese_words,keywords):
                smsData={
-                   "_id": S["_id"],
+                    "_id": S["_id"],
+                    "smsID":S['smsID'],
                     "phoneNo": S["phoneNo"],
                     "smsBody": S['smsBody'],
                     "email": have_common_item(chinese_words,tasks)['email'],
@@ -39,7 +40,8 @@ def filter():
                SMSList.append(smsData)
            else:
                smsData={
-                   "_id": S["_id"],
+                    "_id": S["_id"],
+                    "smsID":S['smsID'],
                     "phoneNo": S["phoneNo"],
                     "smsBody": S['smsBody'],
                     "email": None,
@@ -51,7 +53,8 @@ def filter():
            english_words = S['smsBody'].split()
            if have_common_item(english_words,tasks)['status'] & common(english_words,keywords):
                smsData={
-                   "_id": S["_id"],
+                    "_id": S["_id"],
+                    "smsID":S['smsID'],
                     "phoneNo": S["phoneNo"],
                     "smsBody": S['smsBody'],
                     "email": have_common_item(english_words,tasks)['email'],
@@ -60,7 +63,8 @@ def filter():
                SMSList.append(smsData)
            else:
                smsData={
-                   "_id": S["_id"],
+                    "_id": S["_id"],
+                    "smsID":S['smsID'],
                     "phoneNo": S["phoneNo"],
                     "smsBody": S['smsBody'],
                     "email": None,
@@ -95,7 +99,8 @@ def filterOne():
             chinese_words = list(jieba.lcut(sms['smsBody']))
             if have_common_item(chinese_words,tasks)['status'] & common(chinese_words,keywords):
                sms_object={
-                   "_id": inserted_id,
+                    "_id": inserted_id,
+                    "smsID": sms['smsID'],
                     "phoneNo": sms["phoneNo"],
                     "smsBody": sms['smsBody'],
                     "email": have_common_item(chinese_words,tasks)['email'],
@@ -103,7 +108,8 @@ def filterOne():
                }
             else:
                 sms_object={
-                   "_id": inserted_id,
+                    "_id": inserted_id,
+                    "smsID": sms['smsID'],
                     "phoneNo": sms["phoneNo"],
                     "smsBody": sms['smsBody'],
                     "email": None,
@@ -114,6 +120,7 @@ def filterOne():
             if have_common_item(english_words, tasks)['status']& common(english_words, keywords):
                 sms_object={
                     "_id": inserted_id,
+                    "smsID": sms['smsID'],
                     "phoneNo": sms["phoneNo"],
                     "smsBody": sms['smsBody'],
                     "email": have_common_item(english_words,tasks)['email'],
@@ -122,6 +129,7 @@ def filterOne():
             else:
                 sms_object={
                     "_id": inserted_id,
+                    "smsID": sms['smsID'],
                     "phoneNo": sms["phoneNo"],
                     "smsBody": sms['smsBody'],
                     "email": None,
