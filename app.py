@@ -72,13 +72,19 @@ def filter():
                }
                SMSList.append(smsData)
     return jsonify(SMSList)
-# 在手機處於運行狀態時收到了一條SMS，插入MongoDB以及做篩選
+# 在手機處於運行狀態時收到了一條或者多條SMS，插入MongoDB以及做篩選
 @app.route('/filter/one/sms', methods=['POST'])
 def filterOne():
     data=request.get_json()
     tasks=data.get('tasks',[])
     keywords=data.get('keywords',[])
-    sms=data.get('sms',{})
+    sms_list=data.get('sms',[])
+    result_sms_list=[]
+    new_sms_list=[]
+    for sms in sms_list:
+        sms_id = sms.get('smsID')
+        if not SMS.find_one({'smsID': sms_id}):
+            new_sms_list.append(sms)
     def have_common_item(list1, list2):
         for i in list1:
             for j in list2:  
@@ -92,7 +98,7 @@ def filterOne():
                     return True
         return False
     sms_object={}
-    if sms:
+    for sms in new_sms_list:
         result=SMS.insert_one(sms)
         inserted_id=str(result.inserted_id)
         if any('\u4e00' <= char <= '\u9fff' for char in sms['smsBody']):
@@ -105,7 +111,8 @@ def filterOne():
                     "smsBody": sms['smsBody'],
                     "email": have_common_item(chinese_words,tasks)['email'],
                     "selected": True
-               }
+                }
+               result_sms_list.append(sms_object)
             else:
                 sms_object={
                     "_id": inserted_id,
@@ -114,7 +121,8 @@ def filterOne():
                     "smsBody": sms['smsBody'],
                     "email": None,
                     "selected": False
-               }
+                }
+                result_sms_list.append(sms_object)
         else:
             english_words = sms['smsBody'].split()
             if have_common_item(english_words, tasks)['status']& common(english_words, keywords):
@@ -126,6 +134,7 @@ def filterOne():
                     "email": have_common_item(english_words,tasks)['email'],
                     "selected": True
                 }
+                result_sms_list.append(sms_object)
             else:
                 sms_object={
                     "_id": inserted_id,
@@ -135,7 +144,9 @@ def filterOne():
                     "email": None,
                     "selected": False
                 }
-        return jsonify({"message": sms_object})
+                result_sms_list.append(sms_object)
+    if len(result_sms_list)>0:
+        return jsonify({"message": result_sms_list})
     else:
         return jsonify({"message": "SMS is empty"})
 if __name__ == "__main__":
